@@ -1,0 +1,27 @@
+.member-card {
+  border-width: 0px 0px 2px 0px;
+  border-style: solid;
+  padding: 1rem;
+}
+
+.member-card-name {
+  font-size: 22px;
+}
+
+.member-card-role {
+  margin-top: 0.25rem;
+}
+
+.member-card-status-container {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.member-card-status-icon {
+  font-size: 22px;
+}
+
+.member-card-status {
+  margin-left: 0.5rem;
+}
