@@ -9,6 +9,9 @@ import {
   Row,
   Drawer,
   Select,
+  Form,
+  Input,
+  Button,
 } from "antd";
 
 import "./style.css";
@@ -18,16 +21,33 @@ import firebase from "../../config/firebase";
 const { Option } = Select;
 const { Header, Content, Footer } = Layout;
 
+const logInUser = ({ email, password }) =>
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(email, password)
+    .then((response) => console.log("logged in"))
+    .catch(console.error);
+
+const logOutUser = () =>
+  firebase
+    .auth()
+    .signOut()
+    .then(() => console.log("user logged out"))
+    .catch(console.error);
+
 const accountMenu = (
   <Menu>
     <Menu.Item>Profile</Menu.Item>
-    <Menu.Item danger>Logout</Menu.Item>
+    <Menu.Item onClick={logOutUser} danger>
+      Logout
+    </Menu.Item>
   </Menu>
 );
 
 function Home() {
   const [team, setTeam] = useState(null);
   const [user, setUser] = useState(null);
+  const [userAuthObj, setUserAuthObj] = useState(null);
   const [common, setCommon] = useState(null);
   const [statusDrawerVisible, setStatusDrawerVisible] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
@@ -52,20 +72,27 @@ function Home() {
       .catch((err) => {
         console.error(err);
       });
-
-    console.log({ uid: firebase.auth().currentUser.uid, status });
   };
 
+  // auth listener
   useEffect(() => {
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        setUserAuthObj(user);
+      } else {
+        setUserAuthObj(null);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!userAuthObj) return;
+
     firebase
-      .auth()
-      .signInWithEmailAndPassword(
-        process.env.REACT_APP_AUTH_EMAIL,
-        process.env.REACT_APP_AUTH_PASSWORD
-      )
-      .then((response) =>
-        firebase.firestore().collection("users").doc(response.user.uid).get()
-      )
+      .firestore()
+      .collection("users")
+      .doc(userAuthObj.uid)
+      .get()
       .then((doc) => {
         if (doc.exists) {
           setUser(doc.data());
@@ -101,11 +128,23 @@ function Home() {
               console.log("No config available!");
             }
           });
-      })
-      .catch((err) => {
-        console.error(err);
       });
-  }, []);
+  }, [userAuthObj]);
+
+  const layout = {
+    labelCol: {
+      span: 8,
+    },
+    wrapperCol: {
+      span: 16,
+    },
+  };
+  const tailLayout = {
+    wrapperCol: {
+      offset: 8,
+      span: 16,
+    },
+  };
 
   return (
     <Layout className="layout">
@@ -177,22 +216,63 @@ function Home() {
             {team ? team.info.organization : "My Team"}
           </Breadcrumb.Item>
         </Breadcrumb>
-        <Spin spinning={!(team && team.members.length)}>
-          <div className="site-layout-content">
-            <div className="cards-container">
-              <Row gutter={[24, 24]} style={{ width: "100%" }}>
-                {team &&
-                  team.members.map((memberId) => (
-                    <MemberCard
-                      key={memberId}
-                      memberId={memberId}
-                      status={common}
-                    />
-                  ))}
-              </Row>
+        {userAuthObj ? (
+          <Spin spinning={!(team && team.members.length)}>
+            <div className="site-layout-content">
+              <div className="cards-container">
+                <Row gutter={[24, 24]} style={{ width: "100%" }}>
+                  {team &&
+                    team.members.map((memberId) => (
+                      <MemberCard
+                        key={memberId}
+                        memberId={memberId}
+                        status={common}
+                      />
+                    ))}
+                </Row>
+              </div>
             </div>
-          </div>
-        </Spin>
+          </Spin>
+        ) : (
+          <Form
+            {...layout}
+            name="basic"
+            onFinish={logInUser}
+            onFinishFailed={console.log}
+          >
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your email!",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your password!",
+                },
+              ]}
+            >
+              <Input.Password />
+            </Form.Item>
+
+            <Form.Item {...tailLayout}>
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            </Form.Item>
+          </Form>
+        )}
       </Content>
 
       <Footer style={{ textAlign: "center" }}>
