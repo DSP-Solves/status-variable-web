@@ -25,3 +25,168 @@
   flex-direction: row;
   flex-wrap: wrap;
 }
+
+.no-team-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.no-team-info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.no-team-info-container span {
+  padding-bottom: 16px;
+}
+
+.auth-form-container {
+  display: flex;
+  padding: 2rem;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-form-container {
+  background-color: white;
+  width: 50vw;
+  padding: 2rem 4rem;
+}
+
+.login-form-title-container {
+  margin-bottom: 2rem;
+}
+
+.login-form-title {
+  font-size: 24px;
+}
+
+#normal_login .login-form {
+  max-width: 300px;
+}
+
+#normal_login .login-form-forgot {
+  float: right;
+}
+
+#normal_login .ant-col-rtl .login-form-forgot {
+  float: left;
+}
+
+#normal_login .login-form-button {
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+
+.register-form-container {
+  background-color: white;
+  width: 50vw;
+  padding: 2rem 4rem;
+}
+
+.register-form-title-container {
+  margin-bottom: 2rem;
+}
+
+.register-form-title {
+  font-size: 24px;
+}
+
+#normal_register .register-form {
+  max-width: 300px;
+}
+
+#normal_register .register-form-forgot {
+  float: right;
+}
+
+#normal_register .ant-col-rtl .register-form-forgot {
+  float: left;
+}
+
+#normal_register .register-form-button {
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+
+.password-reset-form-container {
+  background-color: white;
+  width: 50vw;
+  padding: 2rem 4rem;
+}
+
+.password-reset-form-title-container {
+  margin-bottom: 2rem;
+}
+
+.password-reset-form-title {
+  font-size: 24px;
+}
+
+#normal_password_reset .password-reset-form {
+  max-width: 300px;
+}
+
+#normal_password_reset .password-reset-form-forgot {
+  float: right;
+}
+
+#normal_password_reset .ant-col-rtl .password-reset-form-forgot {
+  float: left;
+}
+
+#normal_password_reset .password-reset-form-button {
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+
+.create-team-form-container {
+  display: flex;
+  padding: 2rem;
+  flex-direction: column;
+  align-items: center;
+}
+
+.create-team-form-container-actual {
+  background-color: white;
+  width: 50vw;
+  padding: 2rem 4rem;
+}
+
+.create-team-form-title-container {
+  margin-bottom: 2rem;
+}
+
+.create-team-form-title {
+  font-size: 24px;
+}
+
+#normal_create_team .create-team-form {
+  max-width: 300px;
+}
+
+#normal_create_team .create-team-form-forgot {
+  float: right;
+}
+
+#normal_create_team .ant-col-rtl .create-team-form-forgot {
+  float: left;
+}
+
+#normal_create_team .create-team-form-button {
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+
+.look-like-a-tag {
+  color: #1890ff;
+  text-decoration: none;
+  background-color: transparent;
+  outline: none;
+  cursor: pointer;
+  -webkit-transition: color 0.3s;
+  transition: color 0.3s;
+  -webkit-text-decoration-skip: objects;
+}
