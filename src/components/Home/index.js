@@ -78,6 +78,10 @@ function Home() {
   const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [registering, setRegistering] = useState(false);
 
+  const [showOverviewView, setShowOverviewView] = useState(true);
+  const [showMyTeamView, setShowMyTeamView] = useState(false);
+  const [showBillingView, setShowBillingView] = useState(false);
+
   let statusSelectRef;
 
   const refreshUserData = new Promise((resolve, reject) => {
@@ -311,7 +315,32 @@ function Home() {
         <div className="logo-and-nav-container">
           <span className="logo-title">StatusVariable</span>
           {userAuthObj && (
-            <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["1"]}>
+            <Menu
+              theme="dark"
+              mode="horizontal"
+              defaultSelectedKeys={["1"]}
+              onSelect={({ key }) => {
+                switch (parseInt(key, 10)) {
+                  case 1:
+                    setShowOverviewView(true);
+                    setShowMyTeamView(false);
+                    setShowBillingView(false);
+                    break;
+                  case 2:
+                    setShowOverviewView(false);
+                    setShowMyTeamView(true);
+                    setShowBillingView(false);
+                    break;
+                  case 3:
+                    setShowOverviewView(false);
+                    setShowMyTeamView(false);
+                    setShowBillingView(true);
+                    break;
+                  default:
+                    break;
+                }
+              }}
+            >
               <Menu.Item key="1">Overview</Menu.Item>
               {!userPrettyNew && <Menu.Item key="2">My Team</Menu.Item>}
               <Menu.Item key="3">Billing</Menu.Item>
@@ -388,9 +417,9 @@ function Home() {
             opacity: userAuthObj && !userPrettyNew ? "100%" : "0%",
           }}
         >
-          <Breadcrumb.Item>
-            {team ? team.info.organization : "My Team"}
-          </Breadcrumb.Item>
+          <Breadcrumb.Item>{team && team.info.organization}</Breadcrumb.Item>
+          {showMyTeamView && <Breadcrumb.Item>{"My Team"}</Breadcrumb.Item>}
+          {showBillingView && <Breadcrumb.Item>{"Billing"}</Breadcrumb.Item>}
         </Breadcrumb>
 
         {userAuthObj ? (
@@ -551,18 +580,30 @@ function Home() {
             ) : (
               <Spin spinning={!(team && team.members.length)}>
                 <div className="site-layout-content">
-                  <div className="cards-container">
-                    <Row gutter={[24, 24]} style={{ width: "100%" }}>
-                      {team &&
-                        team.members.map((memberId) => (
-                          <MemberCard
-                            key={memberId}
-                            memberId={memberId}
-                            status={common}
-                          />
-                        ))}
-                    </Row>
-                  </div>
+                  {showOverviewView && (
+                    <div className="overview-view-container">
+                      <div className="cards-container">
+                        <Row gutter={[24, 24]} style={{ width: "100%" }}>
+                          {team &&
+                            team.members.map((memberId) => (
+                              <MemberCard
+                                key={memberId}
+                                memberId={memberId}
+                                status={common}
+                              />
+                            ))}
+                        </Row>
+                      </div>
+                    </div>
+                  )}
+
+                  {showMyTeamView && (
+                    <div className="my-team-view-container"></div>
+                  )}
+
+                  {showBillingView && (
+                    <div className="billing-view-container"></div>
+                  )}
                 </div>
               </Spin>
             )}
