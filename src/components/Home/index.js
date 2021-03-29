@@ -24,6 +24,7 @@ import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import "./style.css";
 import MemberCard from "../MemberCard";
 import firebase from "../../config/firebase";
+import AddMemberCard from "../AddMemberCard";
 
 const { Option } = Select;
 const { Header, Content, Footer } = Layout;
@@ -63,11 +64,15 @@ function Home() {
   const [userAuthObj, setUserAuthObj] = useState(null);
   const [common, setCommon] = useState(null);
   const [userPrettyNew, setUserPrettyNew] = useState(false);
-  const [statusDrawerVisible, setStatusDrawerVisible] = useState(false);
-  const [statusUpdating, setStatusUpdating] = useState(false);
   const [showNoTeamView, setShowNoTeamView] = useState(false);
   const [showPasswordResetForm, setShowPasswordResetForm] = useState(false);
   const [planMemberSize, setPlanMemberSize] = useState(5);
+
+  const [statusDrawerVisible, setStatusDrawerVisible] = useState(false);
+  const [statusUpdating, setStatusUpdating] = useState(false);
+
+  const [addMemberDrawerVisible, setAddMemberDrawerVisible] = useState(false);
+  const [memberAdding, setMemberAdding] = useState(false);
 
   const [showCreateTeamForm, setShowCreateTeamForm] = useState(false);
   const [creatingTeam, setCreatingTeam] = useState(false);
@@ -124,7 +129,10 @@ function Home() {
         console.error(err);
         message.error(err.code);
       })
-      .finally(() => setRegistering(false));
+      .finally(() => {
+        setShowRegisterForm(false);
+        setRegistering(false);
+      });
   };
 
   const logInUser = ({ email, password, remember }) => {
@@ -161,6 +169,39 @@ function Home() {
           }
         });
     }
+  };
+
+  const addMember = ({ email }) => {
+    setMemberAdding(true);
+
+    if (
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1"
+    ) {
+      firebase.functions().useEmulator("localhost", 5001);
+    }
+    const addMemberCloudFunc = firebase.functions().httpsCallable("addMember");
+
+    addMemberCloudFunc({ email, user })
+      .then((response) => {
+        if (response.data.errorInfo) {
+          if (response.data.errorInfo.code === "auth/user-not-found") {
+            message.error("No such user");
+          } else {
+            console.error(response.data.errorInfo);
+            message.error("Bad request");
+          }
+        } else {
+          message.success("Member added");
+          setAddMemberDrawerVisible(false);
+        }
+      })
+      .catch((err) => {
+        console.log({ err });
+      })
+      .finally(() => {
+        setMemberAdding(false);
+      });
   };
 
   const registerTeam = async (entries) => {
@@ -592,6 +633,54 @@ function Home() {
                                 status={common}
                               />
                             ))}
+
+                          <AddMemberCard
+                            onClick={() => setAddMemberDrawerVisible(true)}
+                          />
+                          <Drawer
+                            title="Add Member"
+                            placement="right"
+                            closable={false}
+                            onClose={() => setAddMemberDrawerVisible(false)}
+                            visible={addMemberDrawerVisible}
+                            key="right"
+                          >
+                            <Spin spinning={memberAdding}>
+                              <Form
+                                name="normal_add_member"
+                                className="add-member-form"
+                                onFinish={addMember}
+                                onFinishFailed={console.eror}
+                              >
+                                <Form.Item
+                                  name="email"
+                                  label="E-mail"
+                                  rules={[
+                                    {
+                                      type: "email",
+                                      message: "The input is not valid E-mail!",
+                                    },
+                                    {
+                                      required: true,
+                                      message: "Please input your E-mail!",
+                                    },
+                                  ]}
+                                >
+                                  <Input />
+                                </Form.Item>
+
+                                <Form.Item>
+                                  <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    className="add-member-form-button"
+                                  >
+                                    Register
+                                  </Button>
+                                </Form.Item>
+                              </Form>
+                            </Spin>
+                          </Drawer>
                         </Row>
                       </div>
                     </div>
